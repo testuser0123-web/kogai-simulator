@@ -188,8 +188,8 @@ export const Kogai = ({ setRenderProgress }: KogaiProps) => {
     
     for (let i = 0; i < tubes.length; i++) {
       const tube = tubes[i];
-      const tubeData = pattern.data[tube.index];
-      const intensity = tubeData ? (tubeData[s.currentStep] || 0) : 0;
+      const tubeData = pattern?.data?.[tube.index];
+      const intensity = Array.isArray(tubeData) ? (tubeData[s.currentStep] || 0) : 0;
       
       const mat = materialRefs.current[i];
       if (mat) {

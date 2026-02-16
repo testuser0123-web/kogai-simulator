@@ -168,7 +168,9 @@ export const Simulator = () => {
         await ffmpeg.exec(args);
 
         const data = await ffmpeg.readFile('output.mp4');
-        const outputBlob = new Blob([data], { type: 'video/mp4' });
+        // SharedArrayBuffer から通常の ArrayBuffer へコピーして型エラーと制約を回避
+        const uint8Array = new Uint8Array(data as Uint8Array);
+        const outputBlob = new Blob([uint8Array.buffer], { type: 'video/mp4' });
         const url = URL.createObjectURL(outputBlob);
         
         const now = new Date();
@@ -254,7 +256,7 @@ export const Simulator = () => {
         <ambientLight intensity={0.4} />
         <spotLight position={[5, 10, 5]} angle={0.3} penumbra={1} intensity={2} castShadow />
         <Kogai setRenderProgress={setRenderProgress} />
-        <EffectComposer disableNormalPass>
+        <EffectComposer enableNormalPass={false}>
           <Bloom 
             luminanceThreshold={0.2} 
             luminanceSmoothing={0.9} 
