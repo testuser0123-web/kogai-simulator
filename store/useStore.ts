@@ -80,6 +80,8 @@ interface SimulatorState {
   isRecording: boolean;
   renderProgress: number;
   floatingPosition: { x: number; y: number } | null;
+  audioUrl: string | null;
+  audioStartOffset: number; // ms
 
   addProject: (name: string) => void;
   deleteProject: (id: string) => void;
@@ -93,6 +95,8 @@ interface SimulatorState {
   setRenderProgress: (progress: number) => void;
   setFloatingPosition: (pos: { x: number; y: number } | null) => void;
   setElapsedTime: (t: number) => void;
+  setAudioUrl: (url: string | null) => void;
+  setAudioStartOffset: (offset: number) => void;
   
   setBpm: (bpm: number) => void;
   setNumTubes: (n: number) => void;
@@ -145,6 +149,7 @@ export const useStore = create<SimulatorState>()(
       sequence: [{ patternId: DEFAULT_PATTERN_ID, motionMode: 'static' }],
       currentSequenceIndex: 0, isPlaying: false, currentStep: 0, elapsedTime: 0,
       isSettingsOpen: false, isFloating: false, isRecording: false, renderProgress: 0, floatingPosition: null,
+      audioUrl: null, audioStartOffset: 0,
 
       addProject: (name: string) => {
         const id = `proj-${Date.now()}`;
@@ -208,6 +213,8 @@ export const useStore = create<SimulatorState>()(
       setRenderProgress: (renderProgress) => set({ renderProgress }),
       setFloatingPosition: (floatingPosition) => set({ floatingPosition }),
       setElapsedTime: (elapsedTime) => set({ elapsedTime }),
+      setAudioUrl: (url) => set({ audioUrl: url }),
+      setAudioStartOffset: (offset) => set({ audioStartOffset: offset }),
       setBpm: (bpm) => { set({ bpm }); get().syncCurrentProject(); },
       setNumTubes: (numTubes) => { set({ numTubes }); get().syncCurrentProject(); },
       setTubeLength: (idx, len) => { set({ tubeLengths: { ...get().tubeLengths, [idx]: len } }); get().syncCurrentProject(); },
@@ -294,6 +301,14 @@ export const useStore = create<SimulatorState>()(
       stopPlay: () => set({ isPlaying: false, currentStep: 0, currentSequenceIndex: 0, currentPatternId: get().sequence[0]?.patternId || get().currentPatternId }),
       setCurrentStep: (step) => set({ currentStep: step }),
     }),
-    { name: 'kogai-simulator-v2', storage: createJSONStorage(() => localStorage) }
+    { 
+      name: 'kogai-simulator-v2', 
+      storage: createJSONStorage(() => localStorage),
+      partialize: (state) => {
+        // audioUrlはBlob URLなので保存しない
+        const { audioUrl, ...rest } = state;
+        return rest;
+      }
+    }
   )
 );
