@@ -1,36 +1,80 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# KOGAI SIMULATOR (光害シミュレーター)
 
-## Getting Started
+「光害」などのLEDチューブアレイを用いたパフォーマンスのための、高度な3Dシミュレーション・制作プラットフォームです。リアルタイムでのパターン作成から、音源に同期したシーケンス構成、そして高精度な動画書き出しまでを一気通貫で行うことができます。
 
-First, run the development server:
+## 概要
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+KOGAI SIMULATORは、パフォーマーやデザイナーがLEDチューブの点灯タイミングや動きを正確にプログラミングすることを可能にします。直感的なパターンエディタ、タイムライン形式のシーケンサー、そしてブルーム効果や物理挙動を再現した3Dビューアを備えています。
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 主な機能
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 🎨 制作・編集機能
+*   **パターンエディタ**: ステップごとに各チューブの点灯強度を詳細にカスタマイズ可能。
+*   **タイムラインシーケンサー**: 作成したパターンを楽曲の構成に合わせて自由に配置。
+*   **モーションコントロール**: 「静止」と「8の字」の動きを小節ごとに切り替え可能。
+*   **BPM管理**: 楽曲のテンポに合わせた正確なタイミング管理。
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 🔊 オーディオ同期
+*   **ドラッグ＆ドロップ**: ローカルの音源ファイルを直接読み込み。
+*   **精密なオフセット調整**: ミリ秒単位で再生開始位置を調整し、シミュレーションと完璧に同期。
+*   **シーク同期**: タイムラインのどの位置から再生しても、音源と映像が常に一致。
 
-## Learn More
+### 🎥 高精度録画システム（オフラインレンダリング）
+ブラウザの標準的な録画機能を超えた、独自の高品質書き出し機能を搭載しています。
+*   **コマ落ちゼロのBPM同期**: PCの性能に関わらず、1/4倍速のスローモーションで1フレームずつ確実に描画する「決定論的レンダリング」を採用。
+*   **自動マスタリング**: 録画終了後、ブラウザ内の **FFmpeg.wasm** が以下の処理を自動実行します。
+    *   スロー映像を4倍速に変換（元のテンポに復元）。
+    *   元の音源ファイルを高品質に合成。
+    *   数学的に計算された「理想の楽曲長」に合わせて微細な時間軸補正を行い、BPMのズレを完全に排除。
+*   **高品質出力**: 60fps / H.264 / AAC 形式のMP4ファイルを出力。
 
-To learn more about Next.js, take a look at the following resources:
+## 技術スタック
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+*   **フレームワーク**: Next.js 15 (App Router)
+*   **3D / グラフィックス**: React Three Fiber, Three.js
+*   **ポストプロセス**: @react-three/postprocessing (Bloom効果)
+*   **状態管理**: Zustand (永続化対応)
+*   **動画処理**: FFmpeg.wasm (クライアントサイド・エンコーディング)
+*   **スタイリング**: Tailwind CSS
+*   **アイコン**: Lucide React
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 使い方
 
-## Deploy on Vercel
+### 事前準備
+*   Node.js (v18以降)
+*   npm
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### インストール・起動
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1.  リポジトリのクローン:
+    ```bash
+    git clone https://github.com/testuser0123-web/kogai-simulator.git
+    cd kogai-simulator
+    ```
+
+2.  依存関係のインストール:
+    ```bash
+    npm install
+    ```
+
+3.  開発サーバーの起動:
+    ```bash
+    npm run dev
+    ```
+
+4.  ブラウザで `http://localhost:3000` を開きます。
+
+## 録画ガイド
+
+1.  **シーケンス作成**: タイムラインにパターンを配置し、楽曲を構成します。
+2.  **音源の読み込み**: 音源ファイルをドラッグ＆ドロップし、オフセットを調整します。
+3.  **録画開始**: "RECORD VIDEO" ボタンをクリックします。
+    *   **重要**: 高品質なキャプチャを行うため、シミュレーションは **1/4倍速（スロー）** で再生されます。これは正常な動作です。
+    *   録画中はブラウザのタブを切り替えないでください。
+4.  **終了と現像**: シーケンスの最後まで到達すると録画が停止します。
+5.  **処理の待機**: "Processing Master..." という表示が出ている間、FFmpegが動画の倍速処理と音声合成を行っています（数十秒〜数分かかる場合があります）。
+6.  **保存**: 完了すると、正しいBPMで音声が入った完成済みのMP4ファイルが自動的にダウンロードされます。
+
+## ライセンス
+
+MIT
