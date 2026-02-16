@@ -1,10 +1,34 @@
 'use client';
 
-import { Simulator } from '@/components/simulator/Simulator';
-import { PatternEditor } from '@/components/editor/PatternEditor';
-import { SettingsPanel } from '@/components/editor/SettingsPanel';
-import { SongSequencer } from '@/components/editor/SongSequencer';
-import { ProjectManager } from '@/components/editor/ProjectManager';
+import dynamic from 'next/dynamic';
+
+const Simulator = dynamic(
+  () => import('@/components/simulator/Simulator').then((mod) => mod.Simulator),
+  {
+    ssr: false,
+    loading: () => <div className="aspect-video w-full bg-gray-900 animate-pulse rounded-3xl border border-gray-800" />,
+  }
+);
+
+const PatternEditor = dynamic(
+  () => import('@/components/editor/PatternEditor').then((mod) => mod.PatternEditor),
+  { ssr: false }
+);
+
+const SettingsPanel = dynamic(
+  () => import('@/components/editor/SettingsPanel').then((mod) => mod.SettingsPanel),
+  { ssr: false }
+);
+
+const SongSequencer = dynamic(
+  () => import('@/components/editor/SongSequencer').then((mod) => mod.SongSequencer),
+  { ssr: false }
+);
+
+const ProjectManager = dynamic(
+  () => import('@/components/editor/ProjectManager').then((mod) => mod.ProjectManager),
+  { ssr: false }
+);
 
 export default function Home() {
   return (
