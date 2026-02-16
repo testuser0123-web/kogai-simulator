@@ -111,7 +111,7 @@ export const Simulator = () => {
         ]);
 
         const data = await ffmpeg.readFile('output.mp4');
-        const outputBlob = new Blob([data], { type: 'video/mp4' });
+        const outputBlob = new Blob([data as any], { type: 'video/mp4' });
         const url = URL.createObjectURL(outputBlob);
         
         // 日付フォーマットの生成: yyyy-mm-dd-hh-MM
@@ -205,7 +205,7 @@ export const Simulator = () => {
         <ambientLight intensity={0.4} />
         <spotLight position={[5, 10, 5]} angle={0.3} penumbra={1} intensity={2} castShadow />
         <Kogai setRenderProgress={setRenderProgress} />
-        <EffectComposer disableNormalPass>
+        <EffectComposer enableNormalPass={false}>
           <Bloom 
             luminanceThreshold={0.2} 
             luminanceSmoothing={0.9} 
